@@ -1,0 +1,6 @@
+[submodule "Stylist/_lib/ECommons"]
+	path = Stylist/_lib/ECommons
+	url = https://github.com/NightmareXIV/ECommons/
+[submodule "Stylist/_lib/NightmareUI"]
+	path = Stylist/_lib/NightmareUI
+	url = https://github.com/NightmareXIV/NightmareUI/
