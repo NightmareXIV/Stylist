@@ -1,0 +1,12 @@
+{
+    "Author": "Developer",
+    "Name": "Advertiser",
+    "InternalName": "Advertiser",
+    "Description": "",
+    "ApplicableVersion": "any",
+    "Punchline": "Gear manager",
+    "RepoUrl": "https://github.com/NightmareXIV/",
+    "AcceptsFeedback": false,
+    "IconUrl": "",
+    "DalamudApiLevel": 11
+}

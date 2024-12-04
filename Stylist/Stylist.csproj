@@ -16,10 +16,10 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <OutputPath>bin\Release\</OutputPath>
-        <NoWarn>CS1591;CS0649;CS8632;CS0169</NoWarn>
+        <NoWarn>CS1591;CS0649;CS8632;CS0169;CS0419</NoWarn>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <UseWindowsForms>true</UseWindowsForms>
-        <CustomCS>true</CustomCS>
+        <CustomCS>false</CustomCS>
     </PropertyGroup>
     <ItemGroup Condition="'$(CustomCS)' != 'true'">
         <Reference Include="FFXIVClientStructs">

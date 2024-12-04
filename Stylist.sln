@@ -3,18 +3,40 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stylist", "Stylist\Stylist.csproj", "{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stylist", "Stylist\Stylist.csproj", "{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommons", "Stylist\_lib\ECommons\ECommons\ECommons.csproj", "{3782F9C8-5AC2-4C82-A3E0-F4B9C063402E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightmareUI", "Stylist\_lib\NightmareUI\NightmareUI\NightmareUI.csproj", "{BFE8EAFB-E2A5-4382-AFA8-EE825B6D07AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		DebugForms|Any CPU = DebugForms|Any CPU
+		DebugForms|x64 = DebugForms|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		ReleaseForms|Any CPU = ReleaseForms|Any CPU
+		ReleaseForms|x64 = ReleaseForms|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|Any CPU.Build.0 = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|x64.ActiveCfg = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Debug|x64.Build.0 = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.DebugForms|Any CPU.ActiveCfg = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.DebugForms|Any CPU.Build.0 = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.DebugForms|x64.ActiveCfg = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.DebugForms|x64.Build.0 = Debug|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|Any CPU.ActiveCfg = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|Any CPU.Build.0 = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|x64.ActiveCfg = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.Release|x64.Build.0 = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|Any CPU.ActiveCfg = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|Any CPU.Build.0 = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|x64.ActiveCfg = Release|x64
+		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
