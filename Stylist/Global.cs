@@ -23,4 +23,4 @@ global using static Stylist.Stylist;
 global using static ECommons.GenericHelpers;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 global using LAction = Lumina.Excel.Sheets.Action;
-global using Action = System.Action;
+global using SAction = System.Action;

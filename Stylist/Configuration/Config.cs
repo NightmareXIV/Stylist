@@ -1,10 +1,13 @@
-﻿using System;
+﻿using ECommons.Configuration;
+using ECommons.ExcelServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Stylist.Configuration;
-public class Config
+public class Config : IEzConfig
 {
+    public Dictionary<Job, Dictionary<BaseParamEnum, float>> Priorities = [];
 }
