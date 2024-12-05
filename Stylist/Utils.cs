@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using Dalamud.Memory;
+using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -65,7 +66,12 @@ public static unsafe class Utils
                     {
                         var t = entry->Items.GetPointer(q);
                         t->ItemId = candidate.Value.GetSlot().GetItemId();
+                        t->GlamourId = candidate.Value.GetSlot().GetGlamourId();
                         t->Flags = 0;
+                        t->Stain0Id = candidate.Value.GetSlot().GetStain(0);
+                        t->Stain1Id = candidate.Value.GetSlot().GetStain(1);
+                        MemoryHelper.WriteRaw((nint)t->Materia.GetPointer(0), MemoryHelper.ReadRaw((nint)candidate.Value.GetSlot().Materia.GetPointer(0), sizeof(ushort) * 5));
+                        MemoryHelper.WriteRaw((nint)t->MateriaGrades.GetPointer(0), MemoryHelper.ReadRaw((nint)candidate.Value.GetSlot().MateriaGrades.GetPointer(0), sizeof(byte) * 5));
                         if(candidate.Value.Type.EqualsAny(InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4))
                         {
                             S.ItemMover.ItemsToMove.Add(candidate.Value);
@@ -79,6 +85,11 @@ public static unsafe class Utils
             {
                 var items = entry->Items;
                 items.GetPointer((int)RaptureGearsetModule.GearsetItemIndex.OffHand)->ItemId = 0;
+            }
+            var ilvl = ItemLevelCalculator.Calculate(*entry);
+            if(ilvl != null)
+            {
+                entry->ItemLevel = (short)ilvl.Value;
             }
         }
     }
