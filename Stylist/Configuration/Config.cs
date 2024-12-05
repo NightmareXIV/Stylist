@@ -10,4 +10,5 @@ namespace Stylist.Configuration;
 public class Config : IEzConfig
 {
     public Dictionary<Job, Dictionary<BaseParamEnum, float>> Priorities = [];
+    public bool UseInventory = true;
 }

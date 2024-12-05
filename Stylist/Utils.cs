@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.Interop;
 using Lumina.Excel.Sheets;
+using Stylist.Configuration;
 using System.Diagnostics;
 
 namespace Stylist;
@@ -219,6 +220,43 @@ public static unsafe class Utils
             }
         }
         return [];
+    }
+
+    public static JobRole GetRole(this Job job)
+    {
+        if(Svc.Data.GetExcelSheet<ClassJob>().TryGetRow((uint)job, out var data))
+        {
+            if(data.ClassJobCategory.RowId == 33)
+            {
+                //crafters
+                return JobRole.Crafters;
+            }
+            if(data.ClassJobCategory.RowId == 32) //gatherers
+            {
+                return JobRole.Gatherers;
+            }
+            if(Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(73).IsJobInCategory(job)) //healers
+            {
+                return JobRole.Healers;
+            }
+            if(Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(113).IsJobInCategory(job)) //tanks
+            {
+                return JobRole.Tanks;
+            }
+            if(Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(114).IsJobInCategory(job)) //melee dps
+            {
+                return JobRole.Melee;
+            }
+            if(Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(66).IsJobInCategory(job)) //ranged dps
+            {
+                return JobRole.PhysicalRanged;
+            }
+            if(Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(63).IsJobInCategory(job)) //magical dps
+            {
+                return JobRole.MagicalRanged;
+            }
+        }
+        return JobRole.Other;
     }
 
     public static Dictionary<BaseParamEnum, float> GetDefaultBParamDict(BaseParamEnum[] defaultParams)
