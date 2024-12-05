@@ -1,9 +1,68 @@
 ﻿using ECommons.ExcelServices;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lumina.Excel.Sheets;
 
 namespace Stylist;
-public static class Utils
+public static unsafe class Utils
 {
+    public static readonly EquipSlotCategoryEnum[] EquipSlots = Enum.GetValues<EquipSlotCategoryEnum>().Where(x => (int)x <= 13).ToArray();
+
+    public static InventoryDescriptor? GetBestItemForJob(this Job job, EquipSlotCategoryEnum slot, bool restrictLevel = true)
+    {
+        InventoryDescriptor? ret = null;
+        var maxLvl = PlayerState.Instance()->ClassJobLevels[Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)job).ExpArrayIndex];
+        foreach(var type in ValidInventories)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->GetSize(); i++)
+            {
+                var item = inv->GetInventorySlot(i);
+                if(item->GetItemId() != 0)
+                {
+                    var descriptor = new InventoryDescriptor(type, i);
+                    if(descriptor.Data.ValueNullable != null && descriptor.Data.Value.EquipSlotCategory.RowId == (uint)slot && descriptor.Data.Value.ClassJobCategory.Value.IsJobInCategory(job))
+                    {
+                        if(restrictLevel && descriptor.Data.Value.LevelEquip > maxLvl) continue;
+                        if(ret == null || ret.Value.Data.Value.LevelItem.RowId > descriptor.Data.Value.LevelItem.RowId)
+                        {
+                            ret = descriptor;
+                        }
+                        else
+                        {
+                            if(GetBaseParamPrioForJob(job).Sum(x => (float)item->GetStat(x.Key) * x.Value) > GetBaseParamPrioForJob(job).Sum(x => (float)ret.Value.GetSlot().GetStat(x.Key) * x.Value))
+                            {
+                                ret = descriptor;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    public static InventoryType[] ValidInventories = 
+    [
+        InventoryType.ArmoryOffHand,
+        InventoryType.ArmoryHead,
+        InventoryType.ArmoryBody,
+        InventoryType.ArmoryHands,
+        InventoryType.ArmoryWaist,
+        InventoryType.ArmoryLegs,
+        InventoryType.ArmoryFeets,
+        InventoryType.ArmoryEar,
+        InventoryType.ArmoryNeck,
+        InventoryType.ArmoryWrist,
+        InventoryType.ArmoryRings,
+        InventoryType.ArmoryMainHand,
+        InventoryType.Inventory1,
+        InventoryType.Inventory2,
+        InventoryType.Inventory3,
+        InventoryType.Inventory4,
+        InventoryType.EquippedItems,
+    ];
+
     public static float GetBaseParamPrio(this Job job, BaseParamEnum param)
     {
         {
