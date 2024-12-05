@@ -2,14 +2,9 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Stylist;
-public unsafe struct InventoryDescriptor
+public unsafe struct InventoryDescriptor : IEquatable<InventoryDescriptor>
 {
     public RowRef<Item> Data;
     public InventoryType Type;
@@ -25,6 +20,23 @@ public unsafe struct InventoryDescriptor
         IsHQ = item.ItemId > 1000000;
     }
 
+    public override bool Equals(object obj)
+    {
+        return obj is InventoryDescriptor descriptor && Equals(descriptor);
+    }
+
+    public bool Equals(InventoryDescriptor other)
+    {
+        return Type == other.Type &&
+               Slot == other.Slot &&
+               IsHQ == other.IsHQ;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Type, Slot, IsHQ);
+    }
+
     public InventoryItem GetSlot()
     {
         return *InventoryManager.Instance()->GetInventoryContainer(Type)->GetInventorySlot(Slot);
@@ -32,6 +44,16 @@ public unsafe struct InventoryDescriptor
 
     public override string ToString()
     {
-        return $"[{Type}|{Slot}] {ExcelItemHelper.GetName(GetSlot().ItemId)}";
+        return $"[{Type}|{Slot}] {ExcelItemHelper.GetName(GetSlot().ItemId, true)} - hq: {IsHQ}";
+    }
+
+    public static bool operator ==(InventoryDescriptor left, InventoryDescriptor right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(InventoryDescriptor left, InventoryDescriptor right)
+    {
+        return !(left == right);
     }
 }

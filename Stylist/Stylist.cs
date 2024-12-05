@@ -1,5 +1,6 @@
 ﻿using Dalamud.Plugin;
 using ECommons;
+using ECommons.Automation.LegacyTaskManager;
 using ECommons.Configuration;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
@@ -12,6 +13,7 @@ public class Stylist : IDalamudPlugin
     public static Stylist P;
     private Config Config;
     public static Config C => P.Config;
+    public TaskManager TaskManager;
     public Stylist(IDalamudPluginInterface pi)
     {
         P = this;
@@ -21,6 +23,7 @@ public class Stylist : IDalamudPlugin
             Config = EzConfig.Init<Config>();
             EzCmd.Add("/stylist", EzConfigGui.Open, "Open the plugin's UI");
             SingletonServiceManager.Initialize(typeof(S));
+            TaskManager = new();
         });
     }
 

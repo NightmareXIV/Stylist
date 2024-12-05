@@ -1,18 +1,93 @@
 ﻿using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using FFXIVClientStructs.Interop;
 using Lumina.Excel.Sheets;
+using System.Diagnostics;
 
 namespace Stylist;
 public static unsafe class Utils
 {
     public static readonly EquipSlotCategoryEnum[] EquipSlots = Enum.GetValues<EquipSlotCategoryEnum>().Where(x => (int)x <= 13).ToArray();
 
-    public static InventoryDescriptor? GetBestItemForJob(this Job job, EquipSlotCategoryEnum slot, bool restrictLevel = true)
+    /*
+     * MainHand,
+        OffHand,
+        Head,
+        Body,
+        Hands,
+        Belt,
+        Legs,
+        Feet,
+        Ears,
+        Neck,
+        Wrists,
+        RingRight,
+        RingLeft,
+        SoulStone
+    */
+    public static readonly EquipSlotCategoryEnum[][] GearsetSlotMap = [
+        [EquipSlotCategoryEnum.WeaponMainHand, EquipSlotCategoryEnum.WeaponTwoHand],
+        [EquipSlotCategoryEnum.OffHand],
+        [EquipSlotCategoryEnum.Head],
+        [EquipSlotCategoryEnum.Body],
+        [EquipSlotCategoryEnum.Gloves],
+        [EquipSlotCategoryEnum.Waist],
+        [EquipSlotCategoryEnum.Legs],
+        [EquipSlotCategoryEnum.Feet],
+        [EquipSlotCategoryEnum.Ears],
+        [EquipSlotCategoryEnum.Neck],
+        [EquipSlotCategoryEnum.Wrists],
+        [EquipSlotCategoryEnum.Ring],
+        [EquipSlotCategoryEnum.Ring],
+        ];
+
+    public static void UpdateGearsetIfNeeded(int index, bool includeInventory = true)
+    {
+        var r = RaptureGearsetModule.Instance();
+        if(index < r->NumGearsets && r->IsValidGearset(index))
+        {
+            var entry = r->Entries.GetPointer(index);
+            InventoryDescriptor? ring = null;
+            for(int q = 0; q < entry->Items.Length && q < Utils.GearsetSlotMap.Length; q++)
+            {
+                var gsItem = entry->GetItem((RaptureGearsetModule.GearsetItemIndex)q);
+                var candidate = Utils.GetBestItemForJob((Job)entry->ClassJob, Utils.GearsetSlotMap[q], true, q == 12?[ring]:null, includeInventory);
+                if(q == 11) ring = candidate;
+                if(candidate != null)
+                {
+                    if(candidate.Value.IsHQ == gsItem.ItemId > 1000000 && candidate.Value.GetSlot().GetItemId() == gsItem.ItemId % 1000000)
+                    {
+                        PluginLog.Debug($"Skipping existing item for slot {q}");
+                    }
+                    else
+                    {
+                        var t = entry->Items.GetPointer(q);
+                        t->ItemId = candidate.Value.GetSlot().GetItemId();
+                        t->Flags = 0;
+                        if(candidate.Value.Type.EqualsAny(InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4))
+                        {
+                            S.ItemMover.ItemsToMove.Add(candidate.Value);
+                        }    
+                        PluginLog.Debug($"Setting item for slot {q}");
+                    }
+                }
+            }
+            var mainHand = ExcelItemHelper.Get(entry->GetItem(RaptureGearsetModule.GearsetItemIndex.MainHand).ItemId % 1000000);
+            if(mainHand != null && mainHand.Value.EquipSlotCategory.RowId == (uint)EquipSlotCategoryEnum.WeaponTwoHand)
+            {
+                var items = entry->Items;
+                items.GetPointer((int)RaptureGearsetModule.GearsetItemIndex.OffHand)->ItemId = 0;
+            }
+        }
+    }
+
+    public static InventoryDescriptor? GetBestItemForJob(this Job job, EquipSlotCategoryEnum[] slot, bool restrictLevel = true, InventoryDescriptor?[] ignore = null, bool includeInventory = true)
     {
         InventoryDescriptor? ret = null;
         var maxLvl = PlayerState.Instance()->ClassJobLevels[Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)job).ExpArrayIndex];
-        foreach(var type in ValidInventories)
+        foreach(var type in includeInventory?ValidInventories:ValidInventoriesArmory)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
             for(int i = 0; i < inv->GetSize(); i++)
@@ -21,10 +96,11 @@ public static unsafe class Utils
                 if(item->GetItemId() != 0)
                 {
                     var descriptor = new InventoryDescriptor(type, i);
-                    if(descriptor.Data.ValueNullable != null && descriptor.Data.Value.EquipSlotCategory.RowId == (uint)slot && descriptor.Data.Value.ClassJobCategory.Value.IsJobInCategory(job))
+                    if(ignore != null && ignore.Contains(descriptor)) continue;
+                    if(descriptor.Data.ValueNullable != null && slot.Contains((EquipSlotCategoryEnum)descriptor.Data.Value.EquipSlotCategory.RowId) && descriptor.Data.Value.ClassJobCategory.Value.IsJobInCategory(job))
                     {
                         if(restrictLevel && descriptor.Data.Value.LevelEquip > maxLvl) continue;
-                        if(ret == null || ret.Value.Data.Value.LevelItem.RowId > descriptor.Data.Value.LevelItem.RowId)
+                        if(ret == null || ret.Value.Data.Value.LevelItem.RowId < descriptor.Data.Value.LevelItem.RowId)
                         {
                             ret = descriptor;
                         }
@@ -42,8 +118,9 @@ public static unsafe class Utils
         return ret;
     }
 
-    public static InventoryType[] ValidInventories = 
+    public static InventoryType[] ValidInventories =
     [
+        InventoryType.EquippedItems,
         InventoryType.ArmoryOffHand,
         InventoryType.ArmoryHead,
         InventoryType.ArmoryBody,
@@ -60,7 +137,23 @@ public static unsafe class Utils
         InventoryType.Inventory2,
         InventoryType.Inventory3,
         InventoryType.Inventory4,
+    ];
+
+    public static InventoryType[] ValidInventoriesArmory =
+    [
         InventoryType.EquippedItems,
+        InventoryType.ArmoryOffHand,
+        InventoryType.ArmoryHead,
+        InventoryType.ArmoryBody,
+        InventoryType.ArmoryHands,
+        InventoryType.ArmoryWaist,
+        InventoryType.ArmoryLegs,
+        InventoryType.ArmoryFeets,
+        InventoryType.ArmoryEar,
+        InventoryType.ArmoryNeck,
+        InventoryType.ArmoryWrist,
+        InventoryType.ArmoryRings,
+        InventoryType.ArmoryMainHand,
     ];
 
     public static float GetBaseParamPrio(this Job job, BaseParamEnum param)
