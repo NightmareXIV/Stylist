@@ -1,4 +1,5 @@
 ﻿using ECommons.ExcelServices;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Memory;
 using ECommons.ExcelServices;
+using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -11,6 +12,20 @@ using System.Diagnostics;
 namespace Stylist;
 public static unsafe class Utils
 {
+    public static readonly List<ForcedItemInfo> ForcedItems = [
+        new(2632, 10, 20),
+        new(2633,10,20),
+        new(2634,10,20),
+        new(8567,25, 20),
+        new(14043, 30,30),
+        new(16039,50,30),
+        new(24589,70,30),
+        new(31393,80,10),
+        new(33648,80,30),
+        new(41081,90,30),
+        new(44410,60,30),
+        ];
+
     public static readonly EquipSlotCategoryEnum[] EquipSlots = Enum.GetValues<EquipSlotCategoryEnum>().Where(x => (int)x <= 13).ToArray();
 
     /*
@@ -48,6 +63,7 @@ public static unsafe class Utils
     public static void UpdateGearsetIfNeeded(int index, bool includeInventory = true)
     {
         var r = RaptureGearsetModule.Instance();
+        var isCurrent = r->CurrentGearsetIndex == index;
         if(index < r->NumGearsets && r->IsValidGearset(index))
         {
             var entry = r->Entries.GetPointer(index);
@@ -78,6 +94,18 @@ public static unsafe class Utils
                             S.ItemMover.ItemsToMove.Add(candidate.Value);
                         }    
                         PluginLog.Debug($"Setting item for slot {q}");
+                        if(isCurrent && C.Reequip)
+                        {
+                            PluginLog.Information($"Re-equipping gearset {index} once all items moved to armory chest");
+                            P.TaskManager.Enqueue(() =>
+                            {
+                                if(S.ItemMover.ItemsToMove.Count > 0) return false;
+                                if(!Player.Interactable) return false;
+                                if(!Svc.ClientState.IsLoggedIn) return null;
+                                RaptureGearsetModule.Instance()->EquipGearset(index);
+                                return true;
+                            }, new(showDebug:true));
+                        }
                     }
                 }
             }
@@ -98,6 +126,7 @@ public static unsafe class Utils
     public static InventoryDescriptor? GetBestItemForJob(this Job job, EquipSlotCategoryEnum[] slot, bool restrictLevel = true, InventoryDescriptor?[] ignore = null, bool includeInventory = true)
     {
         InventoryDescriptor? ret = null;
+        InventoryDescriptor? forcedRet = null;
         var maxLvl = PlayerState.Instance()->ClassJobLevels[Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)job).ExpArrayIndex];
         foreach(var type in includeInventory?ValidInventories:ValidInventoriesArmory)
         {
@@ -112,22 +141,44 @@ public static unsafe class Utils
                     if(descriptor.Data.ValueNullable != null && slot.Contains((EquipSlotCategoryEnum)descriptor.Data.Value.EquipSlotCategory.RowId) && descriptor.Data.Value.ClassJobCategory.Value.IsJobInCategory(job))
                     {
                         if(restrictLevel && descriptor.Data.Value.LevelEquip > maxLvl) continue;
-                        if(ret == null || ret.Value.Data.Value.LevelItem.RowId < descriptor.Data.Value.LevelItem.RowId)
+                        if(ForcedItems.TryGetFirst(x => descriptor.Data.RowId == x.Item.RowId && x.MaxLevel <= maxLvl, out var newForcedItem))
                         {
-                            ret = descriptor;
+                            var prevForcedItem = ForcedItems.FirstOrDefault(s => s.Item.RowId == ret?.Data.RowId);
+                            if(prevForcedItem == null)
+                            {
+                                forcedRet = descriptor;
+                            }
+                            else
+                            {
+                                if(prevForcedItem.MaxLevel < newForcedItem.MaxLevel)
+                                {
+                                    forcedRet = descriptor;
+                                }
+                                else if(prevForcedItem.Power < newForcedItem.Power)
+                                {
+                                    forcedRet = descriptor;
+                                }
+                            }
                         }
                         else
                         {
-                            if(GetBaseParamPrioForJob(job).Sum(x => (float)item->GetStat(x.Key) * x.Value) > GetBaseParamPrioForJob(job).Sum(x => (float)ret.Value.GetSlot().GetStat(x.Key) * x.Value))
+                            if(ret == null || ret.Value.Data.Value.LevelItem.RowId < descriptor.Data.Value.LevelItem.RowId)
                             {
                                 ret = descriptor;
+                            }
+                            else
+                            {
+                                if(GetBaseParamPrioForJob(job).Sum(x => (float)item->GetStat(x.Key) * x.Value) > GetBaseParamPrioForJob(job).Sum(x => (float)ret.Value.GetSlot().GetStat(x.Key) * x.Value))
+                                {
+                                    ret = descriptor;
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        return ret;
+        return forcedRet ?? ret;
     }
 
     public static InventoryType[] ValidInventories =

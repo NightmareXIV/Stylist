@@ -25,5 +25,6 @@ public class MainWindow : ConfigWindow
     void DrawSettings()
     {
         ImGui.Checkbox($"Consider gear from inventory", ref C.UseInventory);
+        ImGui.Checkbox($"Re-equip current gearset if it was updated", ref C.Reequip);
     }
 }

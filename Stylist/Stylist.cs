@@ -1,6 +1,6 @@
 ﻿using Dalamud.Plugin;
 using ECommons;
-using ECommons.Automation.LegacyTaskManager;
+using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.SimpleGui;
