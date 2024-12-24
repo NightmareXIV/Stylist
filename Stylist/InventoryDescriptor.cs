@@ -17,7 +17,7 @@ public unsafe struct InventoryDescriptor : IEquatable<InventoryDescriptor>
         Slot = slot;
         var item = GetSlot();
         Data = new RowRef<Item>(Svc.Data.Excel, item.ItemId % 1000000);
-        IsHQ = item.ItemId > 1000000;
+        IsHQ = item.GetItemId() > 1000000;
     }
 
     public override bool Equals(object obj)

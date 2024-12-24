@@ -1,4 +1,5 @@
-﻿using ECommons.SimpleGui;
+﻿using ECommons.ImGuiMethods.TerritorySelection;
+using ECommons.SimpleGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,5 +27,16 @@ public class MainWindow : ConfigWindow
     {
         ImGui.Checkbox($"Consider gear from inventory", ref C.UseInventory);
         ImGui.Checkbox($"Re-equip current gearset if it was updated", ref C.Reequip);
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Search, "Check For Suggestions"))
+        {
+            P.CheckForSuggestions();
+        }
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Bell, "Configure Notification Zones"))
+        {
+            new TerritorySelector(C.NotifyTerr, (sel, x) =>
+            {
+                C.NotifyTerr = x;
+            });
+        }
     }
 }

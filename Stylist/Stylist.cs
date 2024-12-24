@@ -1,12 +1,16 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Plugin;
 using ECommons;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
+using ECommons.EzEventManager;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Stylist.Configuration;
+using static FFXIVClientStructs.FFXIV.Client.System.String.Utf8String.Delegates;
 
 namespace Stylist;
 
@@ -16,6 +20,7 @@ public unsafe class Stylist : IDalamudPlugin
     private Config Config;
     public static Config C => P.Config;
     public TaskManager TaskManager;
+    public List<DalamudLinkPayload> Links = [];
     public Stylist(IDalamudPluginInterface pi)
     {
         P = this;
@@ -26,7 +31,60 @@ public unsafe class Stylist : IDalamudPlugin
             EzCmd.Add("/stylist", OnCommand, "Open the plugin's UI\n/stylist all|tank|healer|dps|crafter|gatherer|melee|ranged|magic - update certain role gearsets");
             SingletonServiceManager.Initialize(typeof(S));
             TaskManager = new();
+            new EzTerritoryChanged(OnTerritoryChanged);
+            for(int i = 0; i < 101; i++)
+            {
+                Links.Add(Svc.PluginInterface.AddChatLinkHandler((uint)i, HandleLink));
+            }
         });
+    }
+
+    private void OnTerritoryChanged(ushort t)
+    {
+        if(C.NotifyTerr.Contains(t))
+        {
+            CheckForSuggestions();
+        }
+    }
+
+    public void CheckForSuggestions()
+    {
+        var candidates = new List<SeString>();
+        var rgs = RaptureGearsetModule.Instance();
+        for(int i = 0; i < rgs->Entries.Length; i++)
+        {
+            var entry = rgs->Entries[i];
+            if(rgs->IsValidGearset(i))
+            {
+                if(Utils.CheckForUpdateNeeded(i, C.UseInventory))
+                {
+                    candidates.Add(new SeStringBuilder().Add(Links[i]).AddText(entry.NameString).Add(RawPayload.LinkTerminator).Build());
+                }
+            }
+        }
+        if(candidates.Count > 0)
+        {
+            var str = new SeStringBuilder()
+                .AddUiForeground(42)
+                .AddText("The following gearsets can be updated: ");
+            for(int i = 0; i < candidates.Count; i++)
+            {
+                str = str.Append(candidates[i]);
+                if(i < candidates.Count - 1)
+                {
+                    str = str.AddText(", ");
+                }
+                else
+                {
+                    str = str.AddText(". ");
+                }
+            }
+            str = str.Add(Links[100]).AddText("Update all.").Add(RawPayload.LinkTerminator).AddUiForegroundOff();
+            Svc.Chat.Print(new()
+            {
+                Message = str.Build()
+            });
+        }
     }
 
     private void OnCommand(string command, string arguments)
@@ -78,6 +136,26 @@ public unsafe class Stylist : IDalamudPlugin
         }
     }
 
+    public void HandleLink(uint index, SeString text)
+    {
+        PluginLog.Information($"Handling link {index}");
+        if(index == 100)
+        {
+            var ret = UpdateGearsets(x => true);
+            DuoLog.Information($"Updated {ret} gearsets");
+        }
+        else
+        {
+            var rgs = RaptureGearsetModule.Instance();
+            var entry = rgs->Entries[(int)index];
+            if(rgs->IsValidGearset((int)index))
+            {
+                Utils.UpdateGearsetIfNeeded((int)index, C.UseInventory);
+            }
+            DuoLog.Information($"Updated {entry.NameString}");
+        }
+    }
+
     public int UpdateGearsets(Predicate<RaptureGearsetModule.GearsetEntry> predicate)
     {
         var ret = 0;
@@ -97,6 +175,10 @@ public unsafe class Stylist : IDalamudPlugin
 
     public void Dispose()
     {
+        foreach(var x in Links)
+        {
+            Svc.PluginInterface.RemoveChatLinkHandler(x.CommandId);
+        }
         ECommonsMain.Dispose();
     }
 }
