@@ -1,5 +1,7 @@
-﻿using ECommons.ImGuiMethods.TerritorySelection;
+﻿using ECommons.GameHelpers;
+using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.SimpleGui;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Stylist.Gui;
-public class MainWindow : ConfigWindow
+public unsafe class MainWindow : ConfigWindow
 {
     private MainWindow()
     {
@@ -29,7 +31,7 @@ public class MainWindow : ConfigWindow
         ImGui.Checkbox($"Re-equip current gearset if it was updated", ref C.Reequip);
         if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Search, "Check For Suggestions"))
         {
-            P.CheckForSuggestions();
+            P.CheckForSuggestions(true);
         }
         if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Bell, "Configure Notification Zones"))
         {
@@ -37,6 +39,27 @@ public class MainWindow : ConfigWindow
             {
                 C.NotifyTerr = x;
             });
+        }
+        if(ImGui.CollapsingHeader("Blacklisted Gearsets"))
+        {
+            if(Player.CID != 0)
+            {
+                if(!C.BlacklistedGearsets.TryGetValue(Player.CID, out var list))
+                {
+                    C.BlacklistedGearsets[Player.CID] = [];
+                    list = C.BlacklistedGearsets[Player.CID];
+                }
+
+                var rgs = RaptureGearsetModule.Instance();
+                for(int i = 0; i < rgs->Entries.Length; i++)
+                {
+                    var entry = rgs->Entries[i];
+                    if(rgs->IsValidGearset(i))
+                    {
+                        ImGuiEx.CollectionCheckbox($"{entry.NameString}##{i}", i, list);
+                    }
+                }
+            }
         }
     }
 }

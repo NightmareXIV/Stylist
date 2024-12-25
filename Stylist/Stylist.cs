@@ -6,10 +6,12 @@ using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
+using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Stylist.Configuration;
+using System;
 using static FFXIVClientStructs.FFXIV.Client.System.String.Utf8String.Delegates;
 
 namespace Stylist;
@@ -43,11 +45,11 @@ public unsafe class Stylist : IDalamudPlugin
     {
         if(C.NotifyTerr.Contains(t))
         {
-            CheckForSuggestions();
+            CheckForSuggestions(false);
         }
     }
 
-    public void CheckForSuggestions()
+    public void CheckForSuggestions(bool printEmpty)
     {
         var candidates = new List<SeString>();
         var rgs = RaptureGearsetModule.Instance();
@@ -66,7 +68,7 @@ public unsafe class Stylist : IDalamudPlugin
         {
             var str = new SeStringBuilder()
                 .AddUiForeground(42)
-                .AddText("The following gearsets can be updated: ");
+                .AddText("[Stylist] The following gearsets can be updated: ");
             for(int i = 0; i < candidates.Count; i++)
             {
                 str = str.Append(candidates[i]);
@@ -83,6 +85,13 @@ public unsafe class Stylist : IDalamudPlugin
             Svc.Chat.Print(new()
             {
                 Message = str.Build()
+            });
+        }
+        else
+        {
+            Svc.Chat.Print(new()
+            {
+                Message = new SeStringBuilder().AddUiForeground("[Stylist] All gearsets are up to date.", 42).Build()
             });
         }
     }
@@ -126,9 +135,13 @@ public unsafe class Stylist : IDalamudPlugin
         {
             upd = UpdateGearsets(x => ((Job)x.ClassJob).GetRole().EqualsAny(JobRole.Melee, JobRole.MagicalRanged, JobRole.PhysicalRanged));
         }
-        else
+        else if(arguments.EqualsIgnoreCaseAny("c", "config"))
         {
             EzConfigGui.Open();
+        }
+        else
+        {
+            CheckForSuggestions(true);
         }
         if(upd != 0)
         {
@@ -162,6 +175,11 @@ public unsafe class Stylist : IDalamudPlugin
         var rgs = RaptureGearsetModule.Instance();
         for(int i = 0; i < rgs->Entries.Length; i++)
         {
+            if(C.BlacklistedGearsets.SafeSelect(Player.CID)?.Contains((int)i) == true)
+            {
+                PluginLog.Debug($"Gearset {i + 1} blacklisted");
+                continue;
+            }
             var entry = rgs->Entries[i];
             if(rgs->IsValidGearset(i) && predicate(entry))
             {

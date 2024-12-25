@@ -65,6 +65,11 @@ public static unsafe class Utils
         var reequip = false;
         var r = RaptureGearsetModule.Instance();
         var isCurrent = r->CurrentGearsetIndex == index;
+        if(C.BlacklistedGearsets.SafeSelect(Player.CID)?.Contains((int)index) == true)
+        {
+            PluginLog.Debug($"Gearset {index + 1} blacklisted");
+            return;
+        }
         if(index < r->NumGearsets && r->IsValidGearset(index))
         {
             var entry = r->Entries.GetPointer(index);
@@ -133,6 +138,11 @@ public static unsafe class Utils
     {
         var r = RaptureGearsetModule.Instance();
         var isCurrent = r->CurrentGearsetIndex == index;
+        if(C.BlacklistedGearsets.SafeSelect(Player.CID)?.Contains((int)index) == true)
+        {
+            PluginLog.Debug($"Gearset {index + 1} blacklisted");
+            return false;
+        }
         if(index < r->NumGearsets && r->IsValidGearset(index))
         {
             var entry = r->Entries.GetPointer(index);
