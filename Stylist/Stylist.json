@@ -1,8 +1,8 @@
 {
-    "Author": "Developer",
+    "Author": "NightmareXIV",
     "Name": "Stylist",
     "InternalName": "Stylist",
-    "Description": "",
+    "Description": "Gear manager that will watch your gearset for possible upgrades and upgrade them via single command.",
     "ApplicableVersion": "any",
     "Punchline": "Gear manager",
     "RepoUrl": "https://github.com/NightmareXIV/",

@@ -184,6 +184,8 @@ public static unsafe class Utils
                 {
                     var descriptor = new InventoryDescriptor(type, i);
                     if(ignore != null && ignore.Contains(descriptor)) continue;
+                    var suitableJobs = GetSuitableJobsForItem(descriptor.Data.RowId);
+                    if(suitableJobs.Count > 0 && !suitableJobs.Contains(job)) continue;
                     if(descriptor.Data.ValueNullable != null && slot.Contains((EquipSlotCategoryEnum)descriptor.Data.Value.EquipSlotCategory.RowId) && descriptor.Data.Value.ClassJobCategory.Value.IsJobInCategory(job))
                     {
                         PluginLog.Verbose($"Consider {ExcelItemHelper.GetName(item->GetItemId() % 1000000, true)} from {type} / {i}");
@@ -393,4 +395,64 @@ public static unsafe class Utils
         BaseParamEnum.Gathering,
         BaseParamEnum.Perception,
     ];
+
+    public static List<Job> GetSuitableJobsForItem(this uint itemId)
+    {
+        if(Svc.Data.GetExcelSheet<Item>().TryGetRow(itemId, out var item))
+        {
+            var ret = new List<Job>();
+            if(item.GetStat(BaseParamEnum.Intelligence) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsMagicalRangedDps()));
+            }
+            if(item.GetStat(BaseParamEnum.Mind) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsHealer()));
+            }
+            if(item.GetStat(BaseParamEnum.Dexterity) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(105).IsJobInCategory(x)));
+            }
+            if(item.GetStat(BaseParamEnum.Strength) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => Svc.Data.GetExcelSheet<ClassJobCategory>().GetRow(84).IsJobInCategory(x) || x.IsTank()));
+            }
+            if(item.GetStat(BaseParamEnum.Gathering) > 0 || item.GetStat(BaseParamEnum.Perception) > 0 || item.GetStat(BaseParamEnum.GP) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsDol()));
+            }
+            if(item.GetStat(BaseParamEnum.Craftsmanship) > 0 || item.GetStat(BaseParamEnum.Control) > 0 || item.GetStat(BaseParamEnum.CP) > 0)
+            {
+                ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsDoh()));
+            }
+            if(ret.Count == 0)
+            {
+                if(item.GetStat(BaseParamEnum.Tenacity) > 0)
+                {
+                    ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsTank()));
+                }
+                //can not determine by main stat
+                if(item.GetStat(BaseParamEnum.DirectHitRate) > 0 || item.GetStat(BaseParamEnum.CriticalHit) > 0)
+                {
+                    //crit and dh suitable for any dps class
+                    ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsCombat()));
+                }
+                if(item.GetStat(BaseParamEnum.Piety) > 0) 
+                {
+                    //for healers
+                    ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsHealer()));
+                }
+                if(item.GetStat(BaseParamEnum.SpellSpeed) > 0)
+                {
+                    ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsDom()));
+                }
+                if(item.GetStat(BaseParamEnum.SkillSpeed) > 0)
+                {
+                    ret.AddRange(Enum.GetValues<Job>().Where(x => x.IsDow()));
+                }
+            }
+            return ret;
+        }
+        return [];
+    }
 }
