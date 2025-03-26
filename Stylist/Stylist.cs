@@ -1,7 +1,5 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Plugin;
-using ECommons;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
@@ -11,8 +9,6 @@ using ECommons.SimpleGui;
 using ECommons.Singletons;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Stylist.Configuration;
-using System;
-using static FFXIVClientStructs.FFXIV.Client.System.String.Utf8String.Delegates;
 
 namespace Stylist;
 

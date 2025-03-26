@@ -170,6 +170,7 @@ public static unsafe class Utils
 
     public static InventoryDescriptor? GetBestItemForJob(this Job job, EquipSlotCategoryEnum[] slot, bool restrictLevel = true, InventoryDescriptor?[] ignore = null, bool includeInventory = true)
     {
+        var ignoreIlvl = job.IsDol() || job.IsDoh();
         PluginLog.Verbose($"GetBestItemForJob {job}, slots {slot.Print()}, restrictLevel={restrictLevel}, ignore={ignore?.Print()}");
         InventoryDescriptor? ret = null;
         InventoryDescriptor? forcedRet = null;
@@ -211,12 +212,12 @@ public static unsafe class Utils
                         }
                         else
                         {
-                            if(ret == null || descriptor.Data.Value.LevelItem.RowId > ret.Value.Data.Value.LevelItem.RowId)
+                            if(ret == null || (descriptor.Data.Value.LevelItem.RowId > ret.Value.Data.Value.LevelItem.RowId && !ignoreIlvl))
                             {
                                 PluginLog.Verbose($" >>Accepted over {ret} (ilvl)");
                                 ret = descriptor;
                             }
-                            else if(descriptor.Data.Value.LevelItem.RowId == ret.Value.Data.Value.LevelItem.RowId)
+                            else if(ignoreIlvl || descriptor.Data.Value.LevelItem.RowId == ret.Value.Data.Value.LevelItem.RowId)
                             {
                                 if(GetBaseParamPrioForJob(job).Sum(x => (float)item->GetStat(x.Key) * x.Value) > GetBaseParamPrioForJob(job).Sum(x => (float)ret.Value.GetSlot().GetStat(x.Key) * x.Value))
                                 {
