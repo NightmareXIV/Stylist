@@ -10,3 +10,5 @@ jobs:
     uses:
       NightmareXIV/MyDalamudPlugins/.github/workflows/Update_Metadata.yml@main
     secrets: inherit
+    permissions:
+      contents: write
