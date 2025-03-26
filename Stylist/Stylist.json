@@ -5,8 +5,8 @@
     "Description": "Gear manager that will watch your gearset for possible upgrades and upgrade them via single command.",
     "ApplicableVersion": "any",
     "Punchline": "Gear manager",
-    "RepoUrl": "https://github.com/NightmareXIV/",
+    "RepoUrl": "https://github.com/NightmareXIV/Stylist",
     "AcceptsFeedback": false,
     "IconUrl": "",
-    "DalamudApiLevel": 11
+    "DalamudApiLevel": 12
 }
