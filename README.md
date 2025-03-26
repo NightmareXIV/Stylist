@@ -1,5 +1,5 @@
 ﻿# Stylist
-
+Gear manager for FFXIV
 ## Become a Supporter!
 If you like Stylist, please consider becoming a supporter on Patreon or via other means! This will help me to continue updating Stylist and work on new plugins and features and you will receive benefits such as early progress updates, priority support, prioritized feature requests, early testing builds and private tools. 
 - [Subscribe on Patreon](https://subscribe.nightmarexiv.com/) - eligible for Discord role
