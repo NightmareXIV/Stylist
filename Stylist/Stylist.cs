@@ -32,7 +32,7 @@ public unsafe class Stylist : IDalamudPlugin
             new EzTerritoryChanged(OnTerritoryChanged);
             for(int i = 0; i < 101; i++)
             {
-                Links.Add(Svc.PluginInterface.AddChatLinkHandler((uint)i, HandleLink));
+                Links.Add(Svc.Chat.AddChatLinkHandler(HandleLink));
             }
         });
     }
@@ -145,8 +145,9 @@ public unsafe class Stylist : IDalamudPlugin
         }
     }
 
-    public void HandleLink(uint index, SeString text)
+    public void HandleLink(Guid g, SeString text)
     {
+        var index = this.Links.IndexOf(x => x.CommandId == g);
         PluginLog.Information($"Handling link {index}");
         if(index == 100)
         {
@@ -191,7 +192,7 @@ public unsafe class Stylist : IDalamudPlugin
     {
         foreach(var x in Links)
         {
-            Svc.PluginInterface.RemoveChatLinkHandler(x.CommandId);
+            Svc.Chat.RemoveChatLinkHandler(x.CommandId);
         }
         ECommonsMain.Dispose();
     }

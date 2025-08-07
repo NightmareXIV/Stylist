@@ -10,4 +10,5 @@ public static class S
 {
     public static MainWindow MainWindow;
     public static ItemMover ItemMover;
+    public static IpcProvider IpcProvider;
 }

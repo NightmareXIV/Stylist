@@ -106,7 +106,7 @@ public unsafe class ItemMover : IDisposable
             if(EzThrottler.Throttle("MoveItem"))
             {
                 PluginLog.Information($"Move item from {next.Type}/{next.Slot} to {targetInventory}/{targetSlot}");
-                InventoryManager.Instance()->MoveItemSlot(next.Type, (ushort)next.Slot, targetInventory, (ushort)targetSlot, 1);
+                InventoryManager.Instance()->MoveItemSlot(next.Type, (ushort)next.Slot, targetInventory, (ushort)targetSlot, true);
                 Attempts++;
             }
         }
