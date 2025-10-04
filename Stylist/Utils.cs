@@ -60,9 +60,8 @@ public static unsafe class Utils
         [EquipSlotCategoryEnum.Ring],
         ];
 
-    public static void UpdateGearsetIfNeeded(int index, bool includeInventory = true)
+    public static void UpdateGearsetIfNeeded(int index, bool includeInventory = true, bool? shouldEquip = null)
     {
-        var reequip = false;
         var r = RaptureGearsetModule.Instance();
         var isCurrent = r->CurrentGearsetIndex == index;
         if(C.BlacklistedGearsets.SafeSelect(Player.CID)?.Contains((int)index) == true)
@@ -100,10 +99,7 @@ public static unsafe class Utils
                             S.ItemMover.ItemsToMove.Add(candidate.Value);
                         }
                         PluginLog.Debug($"Setting item for slot {q}");
-                        if(isCurrent && C.Reequip)
-                        {
-                            reequip = true;
-                        }
+                        shouldEquip ??= isCurrent && C.Reequip;
                     }
                 }
             }
@@ -120,7 +116,7 @@ public static unsafe class Utils
             }
         }
 
-        if(reequip)
+        if(shouldEquip == true)
         {
             PluginLog.Information($"Re-equipping gearset {index} once all items moved to armory chest");
             P.TaskManager.Enqueue(() =>

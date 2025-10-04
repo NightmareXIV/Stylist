@@ -19,25 +19,49 @@ public unsafe sealed class IpcProvider
     /// </summary>
     /// <param name="gearsetIndex">Gearset index to update</param>
     /// <param name="moveItemsFromInventory">null - respect configuration choice</param>
+    /// <param name="shouldEquip">Whether to equip specified gearset. Setting it to true will always equip it, no matter if it was updated or not. Setting it to false will never equip it. Setting it to null will use player's preferences.</param>
     [EzIPC]
-    public void UpdateGearsetIfNeeded(int gearsetIndex, bool? moveItemsFromInventory)
+    public void UpdateGearsetIfNeededEx(int gearsetIndex, bool? moveItemsFromInventory, bool? shouldEquip = null)
     {
         moveItemsFromInventory ??= C.UseInventory;
-        Utils.UpdateGearsetIfNeeded(gearsetIndex, moveItemsFromInventory.Value);
+        Utils.UpdateGearsetIfNeeded(gearsetIndex, moveItemsFromInventory.Value, shouldEquip);
+    }
+
+    /// <inheritdoc cref="UpdateGearsetIfNeededEx(int, bool?, bool?)"/>
+    [EzIPC]
+    [Obsolete("Use UpdateGearsetIfNeededEx if possible")]
+    public void UpdateGearsetIfNeeded(int gearsetIndex, bool? moveItemsFromInventory)
+    {
+        this.UpdateGearsetIfNeededEx(gearsetIndex, moveItemsFromInventory, null);
     }
 
     /// <summary>
     /// Updates current gearset, if present
     /// </summary>
     /// <param name="moveItemsFromInventory">null - respect configuration choice</param>
+    /// <param name="shouldEquip">Whether to equip specified gearset. Setting it to true will always equip it, no matter if it was updated or not. Setting it to false will never equip it. Setting it to null will use player's preferences.</param>
     [EzIPC]
-    public void UpdateCurrentGearset(bool? moveItemsFromInventory)
+    public void UpdateCurrentGearsetEx(bool? moveItemsFromInventory, bool? shouldEquip = null)
     {
         moveItemsFromInventory ??= C.UseInventory;
         var index = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
         if(index != 255 && RaptureGearsetModule.Instance()->GetGearset(index) != null && RaptureGearsetModule.Instance()->IsValidGearset(index))
         {
-            Utils.UpdateGearsetIfNeeded(index, moveItemsFromInventory.Value);
+            Utils.UpdateGearsetIfNeeded(index, moveItemsFromInventory.Value, shouldEquip);
         }
+    }
+
+    /// <inheritdoc cref="UpdateCurrentGearsetEx(bool?, bool?)"/>
+    [EzIPC]
+    [Obsolete("Use UpdateCurrentGearsetEx if possible")]
+    public void UpdateCurrentGearset(bool? moveItemsFromInventory)
+    {
+        this.UpdateCurrentGearsetEx(moveItemsFromInventory, null);
+    }
+
+    [EzIPC]
+    public bool IsBusy()
+    {
+        return P.TaskManager.IsBusy;
     }
 }
