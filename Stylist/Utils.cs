@@ -60,6 +60,25 @@ public static unsafe class Utils
         [EquipSlotCategoryEnum.Ring],
         ];
 
+    public static InventoryDescriptor? FindGearsetItemInInventory(RaptureGearsetModule.GearsetItem gearsetItem, InventoryContainer* cont)
+    {
+        for(int i = 0; i < cont->Size; i++)
+        {
+            var item = cont->GetInventorySlot(i);
+            if(
+                item->GetItemId() == gearsetItem.ItemId
+                && item->Stains.SequenceEqual([gearsetItem.Stain0Id, gearsetItem.Stain1Id])
+                && item->Materia.SequenceEqual(gearsetItem.Materia)
+                && item->MateriaGrades.SequenceEqual(gearsetItem.MateriaGrades)
+                && gearsetItem.GlamourId == item->GlamourId
+                )
+            {
+                return new(cont->Type, i);
+            }
+        }
+        return null;
+    }
+
     public static void UpdateGearsetIfNeeded(int index, bool includeInventory = true, bool? shouldEquip = null)
     {
         var r = RaptureGearsetModule.Instance();
@@ -69,6 +88,7 @@ public static unsafe class Utils
             PluginLog.Debug($"Gearset {index + 1} blacklisted");
             return;
         }
+        List<RaptureGearsetModule.GearsetItem> itemsToUnmove = [];
         if(index < r->NumGearsets && r->IsValidGearset(index))
         {
             var entry = r->Entries.GetPointer(index);
@@ -97,6 +117,7 @@ public static unsafe class Utils
                         if(candidate.Value.Type.EqualsAny(InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4))
                         {
                             S.ItemMover.ItemsToMove.Add(candidate.Value);
+                            itemsToUnmove.Add(gsItem);
                         }
                         PluginLog.Debug($"Setting item for slot {q}");
                         shouldEquip ??= isCurrent && C.Reequip;
@@ -119,6 +140,7 @@ public static unsafe class Utils
         if(shouldEquip == true)
         {
             PluginLog.Information($"Re-equipping gearset {index} once all items moved to armory chest");
+            var cnt = Memory.ClassInfoCnt;
             P.TaskManager.Enqueue(() =>
             {
                 if(S.ItemMover.ItemsToMove.Count > 0) return false;
@@ -127,6 +149,16 @@ public static unsafe class Utils
                 RaptureGearsetModule.Instance()->EquipGearset(index);
                 return true;
             }, new(showDebug: true));
+            P.TaskManager.Enqueue(() => Memory.ClassInfoCnt != cnt, new(showDebug: true, abortOnTimeout: false, timeLimitMS: 5000));
+            P.TaskManager.Enqueue(() =>
+            {
+                return !Utils.CheckForUpdateNeeded(index, includeInventory);
+            }, new(showDebug: true));
+            if(C.UnmoveItems)
+            {
+                P.TaskManager.Enqueue(() => S.ItemMover.ItemsToUnmove = itemsToUnmove);
+                P.TaskManager.Enqueue(() => S.ItemMover.ItemsToUnmove.Count == 0, new(showDebug: true));
+            }
         }
     }
 
@@ -141,25 +173,36 @@ public static unsafe class Utils
         }
         if(index < r->NumGearsets && r->IsValidGearset(index))
         {
-            var entry = r->Entries.GetPointer(index);
-            InventoryDescriptor? ring = null;
-            for(int q = 0; q < entry->Items.Length && q < Utils.GearsetSlotMap.Length; q++)
+            var normal = r->Entries[index];
+            var ringReversed = normal;
+            (normal.Items[11], normal.Items[12]) = (normal.Items[12], normal.Items[11]);
+
+            int passes = 0;
+
+            foreach(var entry in (RaptureGearsetModule.GearsetEntry[])[normal, ringReversed])
             {
-                var gsItem = entry->GetItem((RaptureGearsetModule.GearsetItemIndex)q);
-                var candidate = Utils.GetBestItemForJob((Job)entry->ClassJob, Utils.GearsetSlotMap[q], true, q == 12 ? [ring] : null, includeInventory);
-                if(q == 11) ring = candidate;
-                if(candidate != null)
+                InventoryDescriptor? ring = null;
+                for(int q = 0; q < entry.Items.Length && q < Utils.GearsetSlotMap.Length; q++)
                 {
-                    if(candidate.Value.GetSlot().GetItemId() == gsItem.ItemId)
+                    var gsItem = entry.GetItem((RaptureGearsetModule.GearsetItemIndex)q);
+                    var candidate = Utils.GetBestItemForJob((Job)entry.ClassJob, Utils.GearsetSlotMap[q], true, q == 12 ? [ring] : null, includeInventory);
+                    if(q == 11) ring = candidate;
+                    if(candidate != null)
                     {
-                        PluginLog.Debug($"Skipping existing item for slot {q}");
-                    }
-                    else
-                    {
-                        return true;
+                        if(candidate.Value.GetSlot().GetItemId() == gsItem.ItemId)
+                        {
+                            PluginLog.Debug($"Skipping existing item for slot {q}");
+                        }
+                        else
+                        {
+                            passes++;
+                            break;
+                        }
                     }
                 }
             }
+            PluginLog.Debug($"Versions passed: {passes}");
+            return passes == 2;
         }
         return false;
     }

@@ -28,6 +28,10 @@ public unsafe class MainWindow : ConfigWindow
     void DrawSettings()
     {
         ImGui.Checkbox($"Consider gear from inventory", ref C.UseInventory);
+        if(C.UseInventory)
+        {
+            ImGui.Checkbox("Move replaced items from armory chest to regular inventory", ref C.UnmoveItems);
+        }
         ImGui.Checkbox($"Re-equip current gearset if it was updated", ref C.Reequip);
         if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Search, "Check For Suggestions"))
         {

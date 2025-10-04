@@ -14,4 +14,5 @@ public class Config : IEzConfig
     public bool Reequip = true;
     public HashSet<uint> NotifyTerr = [];
     public Dictionary<ulong, List<int>> BlacklistedGearsets = [];
+    public bool UnmoveItems = false;
 }
