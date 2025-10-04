@@ -21,7 +21,7 @@ public unsafe sealed class IpcProvider
     /// <param name="moveItemsFromInventory">null - respect configuration choice</param>
     /// <param name="shouldEquip">Whether to equip specified gearset. Setting it to true will always equip it, no matter if it was updated or not. Setting it to false will never equip it. Setting it to null will use player's preferences.</param>
     [EzIPC]
-    public void UpdateGearsetIfNeededEx(int gearsetIndex, bool? moveItemsFromInventory, bool? shouldEquip = null)
+    public void UpdateGearsetIfNeededEx(int gearsetIndex, bool? moveItemsFromInventory, bool? shouldEquip)
     {
         moveItemsFromInventory ??= C.UseInventory;
         Utils.UpdateGearsetIfNeeded(gearsetIndex, moveItemsFromInventory.Value, shouldEquip);
@@ -41,7 +41,7 @@ public unsafe sealed class IpcProvider
     /// <param name="moveItemsFromInventory">null - respect configuration choice</param>
     /// <param name="shouldEquip">Whether to equip specified gearset. Setting it to true will always equip it, no matter if it was updated or not. Setting it to false will never equip it. Setting it to null will use player's preferences.</param>
     [EzIPC]
-    public void UpdateCurrentGearsetEx(bool? moveItemsFromInventory, bool? shouldEquip = null)
+    public void UpdateCurrentGearsetEx(bool? moveItemsFromInventory, bool? shouldEquip)
     {
         moveItemsFromInventory ??= C.UseInventory;
         var index = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
