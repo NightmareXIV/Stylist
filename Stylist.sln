@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.11.35327.3
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11605.240 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stylist", "Stylist\Stylist.csproj", "{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommons", "Stylist\_lib\ECommons\ECommons\ECommons.csproj", "{3782F9C8-5AC2-4C82-A3E0-F4B9C063402E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommons", "ECommons\ECommons\ECommons.csproj", "{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightmareUI", "Stylist\_lib\NightmareUI\NightmareUI\NightmareUI.csproj", "{BFE8EAFB-E2A5-4382-AFA8-EE825B6D07AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NightmareUI", "NightmareUI\NightmareUI\NightmareUI.csproj", "{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +37,38 @@ Global
 		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|Any CPU.Build.0 = Release|x64
 		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|x64.ActiveCfg = Release|x64
 		{ACF9CFC7-CAF6-44D0-99D8-FF420B4E92CD}.ReleaseForms|x64.Build.0 = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Debug|Any CPU.Build.0 = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Debug|x64.ActiveCfg = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Debug|x64.Build.0 = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.DebugForms|Any CPU.ActiveCfg = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.DebugForms|Any CPU.Build.0 = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.DebugForms|x64.ActiveCfg = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.DebugForms|x64.Build.0 = Debug|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Release|Any CPU.ActiveCfg = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Release|Any CPU.Build.0 = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Release|x64.ActiveCfg = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.Release|x64.Build.0 = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.ReleaseForms|Any CPU.ActiveCfg = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.ReleaseForms|Any CPU.Build.0 = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.ReleaseForms|x64.ActiveCfg = Release|x64
+		{0B1F2C54-98D7-DBB6-6CDF-C71EE0173954}.ReleaseForms|x64.Build.0 = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Debug|Any CPU.Build.0 = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Debug|x64.ActiveCfg = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Debug|x64.Build.0 = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.DebugForms|Any CPU.ActiveCfg = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.DebugForms|Any CPU.Build.0 = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.DebugForms|x64.ActiveCfg = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.DebugForms|x64.Build.0 = Debug|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Release|Any CPU.ActiveCfg = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Release|Any CPU.Build.0 = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Release|x64.ActiveCfg = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.Release|x64.Build.0 = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.ReleaseForms|Any CPU.ActiveCfg = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.ReleaseForms|Any CPU.Build.0 = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.ReleaseForms|x64.ActiveCfg = Release|x64
+		{F9E33D7D-7440-7A2C-0B61-84F05EB4A71D}.ReleaseForms|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

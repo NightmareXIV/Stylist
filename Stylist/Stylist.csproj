@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>1.0.0.13</Version>
+        <Version>1.0.0.15</Version>
         <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
@@ -134,5 +134,10 @@
     <ItemGroup>
         <Folder Include="_lib\" />
         <Folder Include="_lib\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+      <ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
     </ItemGroup>
 </Project>

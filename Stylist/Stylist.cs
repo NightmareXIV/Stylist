@@ -37,7 +37,7 @@ public unsafe class Stylist : IDalamudPlugin
         });
     }
 
-    private void OnTerritoryChanged(ushort t)
+    private void OnTerritoryChanged(uint t)
     {
         if(C.NotifyTerr.Contains(t))
         {
