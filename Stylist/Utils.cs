@@ -1,6 +1,7 @@
 ﻿using Dalamud.Memory;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -102,7 +103,8 @@ public static unsafe class Utils
                 {
                     if(candidate.Value.GetSlot().GetItemId() == gsItem.ItemId)
                     {
-                        PluginLog.Debug($"Skipping existing item for slot {q}");
+                        var msg = $"Skipping existing item for slot {q}";
+                        if(EzThrottler.Throttle(msg)) PluginLog.Debug(msg);
                     }
                     else
                     {
@@ -191,7 +193,8 @@ public static unsafe class Utils
                     {
                         if(candidate.Value.GetSlot().GetItemId() == gsItem.ItemId)
                         {
-                            PluginLog.Debug($"Skipping existing item for slot {q}");
+                            var msg = $"Skipping existing item for slot {q}";
+                            if(EzThrottler.Throttle(msg)) PluginLog.Debug(msg);
                         }
                         else
                         {
@@ -201,7 +204,8 @@ public static unsafe class Utils
                     }
                 }
             }
-            PluginLog.Debug($"Versions passed: {passes}");
+            var passesMsg = $"Versions passed: {passes}";
+            if(EzThrottler.Throttle(passesMsg)) PluginLog.Debug(passesMsg);
             return passes == 2;
         }
         return false;
